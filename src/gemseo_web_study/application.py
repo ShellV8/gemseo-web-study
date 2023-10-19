@@ -1,3 +1,4 @@
+# noqa: D100 putting a string makes ST fail
 # Copyright 2021 IRT Saint Exupéry, https://www.irt-saintexupery.com
 #
 # This program is free software; you can redistribute it and/or
@@ -12,7 +13,6 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program; if not, write to the Free Software Foundation,
 # Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""A web GUI for GEMSEO study."""
 from __future__ import annotations
 
 import logging
@@ -33,8 +33,10 @@ from gemseo.problems.scalable.linear.disciplines_generator import (
 from PIL import Image
 from streamlit_tags import st_tags
 
+
+st.set_page_config(page_title="GEMSEO Study", layout="wide")
+
 LOGGER = logging.getLogger(__name__)
-st.set_page_config(page_title="GEMSEO Study", page_icon="🔢", layout="wide")
 
 st.title("GEMSEO Study analysis and prototyping")
 
@@ -131,6 +133,9 @@ if st.button("Generate XDSM", type="primary"):
         disciplines=disciplines,
         formulation=formulation,
     )
+    cmap = {"inequality": "ineq", "equality": "eq"}
+    for constr, ctype in constraints.items():
+        scenario.add_constraint(constr, constraint_type=cmap[ctype])
     tmpdir = tempfile.mkdtemp()
 
     scenario.xdsmize(directory_path=tmpdir)
