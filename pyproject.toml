@@ -1,0 +1,64 @@
+[project]
+name = "gemseo-web-study"
+authors = [
+    {name = "Francois Gallard", email = "contact@gemseo.org"}
+]
+description = "A web interface for GEMSEO to prototype MDO studues"
+license = {text = "GNU Lesser General Public License v3"}
+classifiers = [
+    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+dynamic = ["version"]
+requires-python = ">=3.8, <3.11"
+dependencies = [
+    "gemseo >=5",
+    "streamlit >= 1.27",
+    "streamlit_tags"
+]
+
+[project.optional-dependencies]
+test = [
+    "covdefaults",
+    "pytest",
+    "pytest-cov",
+    "pytest-xdist",
+]
+
+[project.urls]
+Homepage = "https://gitlab.com/gemseo"
+Source = "https://gitlab.com/gemseo/dev/gemseo-web-study"
+Tracker = "https://gitlab.com/gemseo/dev/gemseo-web-study/-/issues"
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.entry-points]
+gemseo_plugins = { gemseo-web-study = "gemseo_web_study"}
+
+[build-system]
+requires = [
+    "setuptools",
+    "setuptools_scm[toml]",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+
+[tool.setuptools]
+license-files = [
+    "LICENSE.txt",
+    "CREDITS.md",
+]
+
+[tool.black]
+target-version = ['py38']

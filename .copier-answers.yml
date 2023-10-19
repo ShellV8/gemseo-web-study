@@ -1,0 +1,13 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: 766afb1
+_src_path: https://gitlab.com/gemseo/dev/copier-gemseo
+author_email: contact@gemseo.org
+author_name: Francois Gallard
+gemseo_min_version: '5'
+package_is_a_gemseo_plugin: true
+project_is_open_source: true
+project_name: gemseo-web-study
+project_name_suffix: web-study
+project_slug: gemseo_web_study
+short_description: A web interface for GEMSEO to prototype MDO studues
+use_gemseo_develop: false
