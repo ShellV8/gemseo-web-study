@@ -11,7 +11,8 @@ A web interface for GEMSEO to prototype MDO studues
 
 # Documentation
 
-How to get the docs?
+To launch the website:
+streamlit run .\src\gemseo_web_study\application.py
 
 # Bugs/Questions
 
