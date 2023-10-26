@@ -54,18 +54,23 @@ for i in range(nb_disc):
 st.divider()
 st.write("Disciplines summary")
 try:
-    df = pd.DataFrame.from_records(
-        [
-            {"Name": i[0], "Inputs": str(sorted(i[1])), "Outputs": str(sorted(i[2]))}
-            for i in disc_desc
-        ],
-        columns=["Name", "Inputs", "Outputs"],
-    )
-    st.dataframe(df, hide_index=True)
-    st.session_state["disciplines_dataframe"] = df
-    st.divider()
-    disciplines = create_disciplines_from_desc(disc_desc)
-    st.session_state["disciplines"] = disciplines
+    if disc_desc is not None:
+        df = pd.DataFrame.from_records(
+            [
+                {
+                    "Name": i[0],
+                    "Inputs": str(sorted(i[1])),
+                    "Outputs": str(sorted(i[2])),
+                }
+                for i in disc_desc
+            ],
+            columns=["Name", "Inputs", "Outputs"],
+        )
+        st.dataframe(df, hide_index=True)
+        st.session_state["disciplines_dataframe"] = df
+        st.divider()
+        disciplines = create_disciplines_from_desc(disc_desc)
+        st.session_state["disciplines"] = disciplines
 
 except ValueError:
     if "disciplines" in st.session_state:

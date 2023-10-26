@@ -99,7 +99,9 @@ if disc_ready:
         if constr:
             constraints[constr] = c_type
 
-    if st.button("Generate XDSM", type="primary"):
+    if not (objective and design_variables):
+        st.error("Please select an objective and design variables")
+    elif st.button("Generate XDSM", type="primary"):
         design_space = create_design_space()
         for name in design_variables:
             design_space.add_variable(name=name)

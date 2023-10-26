@@ -21,6 +21,10 @@ from os.path import join
 import streamlit as st
 from PIL import Image
 
+# this is to keep the widget values between pages
+for k, v in st.session_state.items():
+    st.session_state[k] = v
+
 st.set_page_config(page_title="GEMSEO Study", layout="wide")
 
 

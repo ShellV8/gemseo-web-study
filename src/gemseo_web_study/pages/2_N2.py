@@ -28,8 +28,6 @@ for k, v in st.session_state.items():
 
 disc_ready = "disciplines" in st.session_state
 if disc_ready:
-    st.success("Disciplines are ready")
-
     disciplines = st.session_state["disciplines"]
 
     if st.button("Generate N2", type="primary"):
@@ -42,4 +40,4 @@ if disc_ready:
             source_code = HtmlFile.read()
             components.html(source_code, width=800, height=800)
 else:
-    st.error("Disciplines are not ready, please check the Disciplines tab")
+    st.error("Disciplines are not ready, please check the Disciplines tab.")
