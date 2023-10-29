@@ -29,19 +29,15 @@ from streamlit_tags import st_tags
 for k, v in st.session_state.items():
     st.session_state[k] = v
 st.title("XDSM Generation")
+CTYPES = ["inequality", "equality"]
 
-disc_ready = "disciplines" in st.session_state
-if disc_ready:
+if "disciplines" in st.session_state:
     st.write("Disciplines summary")
     st.dataframe(st.session_state["disciplines_dataframe"], hide_index=True)
     st.divider()
 
     disciplines = st.session_state["disciplines"]
-    all_outputs = set()
-    for disc in disciplines:
-        all_outputs.update(disc.get_output_data_names())
-
-    all_outputs = list(all_outputs)
+    all_outputs = st.session_state["all_outputs"]
     key = "Design variables"
     value = st.session_state.get(key, [])
     design_variables = st_tags(
@@ -49,8 +45,9 @@ if disc_ready:
         text="Press enter to add more",
         suggestions=all_outputs,
         value=value,
-        key=key,
+        key="desvars",
     )
+    st.session_state[key] = design_variables
 
     formulations_key = "formulations_list"
     if formulations_key in st.session_state:
@@ -60,42 +57,56 @@ if disc_ready:
         st.session_state[formulations_key] = formulations
 
     key = "MDO formulation index"
-    form = st.session_state.get(key, "MDF")
-    index = formulations.index(form)
-    formulation = st.selectbox("MDO Formulation", formulations, index=index, key=key)
+    index = st.session_state.get(key, formulations.index("MDF"))
+    formulation = st.selectbox(
+        "MDO Formulation", formulations, index=index, key="MDO formulation"
+    )
+    st.session_state[key] = formulations.index(formulation)
 
     key = "maximize_objective"
     maximize_objective = st.checkbox(
-        "maximize_objective", value=st.session_state.get(key, False), key=key
+        "maximize_objective", value=st.session_state.get(key, False)
     )
+    st.session_state[key] = maximize_objective
 
-    key = "objective"
-    index = st.session_state.get(key)
-    if index is not None:
-        index = all_outputs.index(index)
+    key = "objective_index"
     objective = st.selectbox(
-        "Objective function name", all_outputs, index=index, key=key
+        "Objective function name",
+        all_outputs,
+        index=st.session_state.get(key, 0),
+        key="objective",
     )
+    st.session_state[key] = all_outputs.index(objective)
 
     key = "Number of constraints"
-    nb_disc = st.slider(
+    nb_cstr = st.slider(
         "Number of constraints",
-        min_value=1,
+        min_value=0,
         max_value=20,
-        value=st.session_state.get(key, False),
-        key=key,
+        value=st.session_state.get(key, 0),
     )
+    st.session_state[key] = nb_cstr
 
     constraints = {}
-    for i in range(nb_disc):
+    for i in range(nb_cstr):
         st.divider()
-        constr = st.selectbox(f"Constraint {i + 1}", all_outputs, key=f"constr{i}")
+        key = f"Constraint {i + 1}"
+        c_index = st.session_state.get(key)
+        constr = st.selectbox(key, all_outputs, index=c_index, key="c_" + key)
+        if constr is not None:
+            st.session_state[key] = all_outputs.index(constr)
+
+        key = f"constr_type{i}"
+        c_type_index = st.session_state.get(key, 0)
         c_type = st.selectbox(
             "Constraint type",
-            ["inequality", "equality"],
-            index=0,
-            key=f"constr_type{i}",
+            CTYPES,
+            index=c_type_index,
+            key="c_" + key,
         )
+        if c_type is not None:
+            st.session_state[key] = CTYPES.index(c_type)
+
         if constr:
             constraints[constr] = c_type
 
