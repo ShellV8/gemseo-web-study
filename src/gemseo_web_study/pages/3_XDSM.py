@@ -23,7 +23,6 @@ import streamlit.components.v1 as components
 from gemseo import create_design_space
 from gemseo import create_scenario
 from gemseo import get_available_formulations
-from streamlit_tags import st_tags
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
@@ -38,14 +37,10 @@ if "disciplines" in st.session_state:
 
     disciplines = st.session_state["disciplines"]
     all_outputs = st.session_state["all_outputs"]
+    all_inputs = st.session_state["all_inputs"]
     key = "Design variables"
-    value = st.session_state.get(key, [])
-    design_variables = st_tags(
-        label="Design variables",
-        text="Press enter to add more",
-        suggestions=all_outputs,
-        value=value,
-        key="desvars",
+    design_variables = st.multiselect(
+        "Design variables", options=all_inputs, default=st.session_state.get(key, [])
     )
     st.session_state[key] = design_variables
 

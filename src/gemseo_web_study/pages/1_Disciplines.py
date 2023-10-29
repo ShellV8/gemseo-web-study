@@ -72,9 +72,12 @@ try:
         disciplines = create_disciplines_from_desc(disc_desc)
         st.session_state["disciplines"] = disciplines
         all_outputs = set()
+        all_inputs = set()
         for disc in disciplines:
             all_outputs.update(disc.get_output_data_names())
+            all_inputs.update(disc.get_input_data_names())
         st.session_state["all_outputs"] = sorted(all_outputs)
+        st.session_state["all_inputs"] = sorted(all_inputs)
 
 except (ValueError, TypeError):
     if "disciplines" in st.session_state:
