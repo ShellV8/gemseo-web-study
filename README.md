@@ -12,7 +12,7 @@ A web interface for GEMSEO to prototype MDO studues
 # Documentation
 
 To launch the website:
-streamlit run .\src\gemseo_web_study\application.py
+streamlit run .\src\gemseo_web_study\GEMSEO_study.py
 
 # Bugs/Questions
 
