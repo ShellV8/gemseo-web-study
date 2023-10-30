@@ -126,7 +126,7 @@ if "disciplines" in st.session_state:
 
             scenario.xdsmize(directory_path=tmpdir)
             tmp_html = join(tmpdir, "xdsm.html")
-            with open(tmp_html, encoding="utf-8") as HtmlFile:  #
+            with open(tmp_html, encoding="utf-8") as HtmlFile:
                 source_code = HtmlFile.read()
                 components.html(source_code, width=1280, height=1024)
         except Exception as err:

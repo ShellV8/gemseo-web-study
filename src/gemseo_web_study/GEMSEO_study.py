@@ -27,11 +27,9 @@ for k, v in st.session_state.items():
 
 st.set_page_config(page_title="GEMSEO Study", layout="wide")
 
-
 st.title("GEMSEO Study analysis and prototyping")
 
 logo = Image.open(join(dirname(__file__), "logo-small.webp"))
-
 st.image(logo, width=300)
 
 st.markdown(
