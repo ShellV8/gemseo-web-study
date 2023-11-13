@@ -28,10 +28,15 @@ nb_disc = st.slider(
     "Number of disciplines", min_value=1, max_value=20, value=value, key=key
 )
 
+
 disc_desc = []
 for i in range(nb_disc):
     st.divider()
-    name = st.text_input("Discipline Name", value=f"Discipline{i}", key=f"Disc_{i}")
+    key = f"Disc_{i}_name"
+    value = st.session_state.get(key, f"Discipline_{i}")
+    name = st.text_input("Discipline Name", value=value, key=f"Disc_{i}")
+    st.session_state[key] = name
+
     key = f"Disc_inputs_{i}"
     value = st.session_state.get(key, [])
     inputs = st_tags(
