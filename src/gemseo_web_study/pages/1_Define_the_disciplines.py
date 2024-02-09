@@ -35,10 +35,9 @@ def handle_disciplines_number() -> int:
     """
     key = "Number of disciplines"
     value = st.session_state.get(key, 2)
-    nb_disc = st.slider(
+    return st.slider(
         "Number of disciplines", min_value=1, max_value=20, value=value, key=key
     )
-    return nb_disc
 
 
 def handle_disciplines_description(nb_disc: int, disc_desc: list) -> None:

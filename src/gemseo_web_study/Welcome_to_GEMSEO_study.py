@@ -48,5 +48,13 @@ Then, the scenario is defined by the names of the objectives, constraints,
 design variables, and the selection of the MDO formulation.
 
 The result of the analysis are a N2 and XDSM diagrams.
-"""
+
+The N2 (pronounce "N square") diagram represents the coupling between the disciplines, see: [link]({}).
+
+The XDSM (eXtended Design Structure Matrix) diagram represents MDO process.
+In particular, it is a standard to represent the MDO formulations, see: [link]({}).
+""".format(
+        "https://gemseo.readthedocs.io/en/stable/mdo/coupling.html",
+        "https://gemseo.readthedocs.io/en/stable/mdo/mdo_formulations.html",
+    )
 )

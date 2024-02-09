@@ -21,14 +21,17 @@ from __future__ import annotations
 
 import tempfile
 from os.path import join
+from typing import TYPE_CHECKING
 
 import streamlit as st
 import streamlit.components.v1 as components
+from gemseo import MDODiscipline
 from gemseo import create_design_space
 from gemseo import create_scenario
 from gemseo import get_available_formulations
-from gemseo import MDODiscipline
-from gemseo.core.mdo_scenario import MDOScenario
+
+if TYPE_CHECKING:
+    from gemseo.core.mdo_scenario import MDOScenario
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
@@ -176,6 +179,13 @@ def generate_xdsm(scenario: MDOScenario) -> None:
 
 # Main display sequence
 if "disciplines" in st.session_state:
+    st.markdown(
+        """
+    The XDSM (eXtended Design Structure Matrix) diagram represents MDO process.
+    In particular, it is a standard to represent the MDO formulations, see: [link]({}).
+    """.format("https://gemseo.readthedocs.io/en/stable/mdo/mdo_formulations.html")
+    )
+
     handle_disc_summary()
     handle_design_variables()
     handle_formulation()

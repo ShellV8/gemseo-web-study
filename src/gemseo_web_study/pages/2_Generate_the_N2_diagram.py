@@ -24,8 +24,8 @@ from os.path import join
 
 import streamlit as st
 import streamlit.components.v1 as components
-from gemseo import generate_n2_plot
 from gemseo import MDODiscipline
+from gemseo import generate_n2_plot
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
@@ -46,8 +46,7 @@ def generate_html(_disciplines: list[MDODiscipline], disc_desc: list) -> str:
 
     generate_n2_plot(_disciplines, file_path=tmp_file)
     with open(tmp_html, encoding="utf-8") as html_file:  #
-        source_code = html_file.read()
-    return source_code
+        return html_file.read()
 
 
 def handle_n2_genration() -> None:
@@ -72,4 +71,10 @@ def handle_n2_genration() -> None:
 
 
 # Main display sequence
+st.markdown(
+    """
+The N2 (pronounce "N square") diagram represents the coupling between the disciplines, see: [link]({}).
+""".format("https://gemseo.readthedocs.io/en/stable/mdo/coupling.html")
+)
+
 handle_n2_genration()

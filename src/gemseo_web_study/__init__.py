@@ -17,4 +17,5 @@
 #        :author: Francois Gallard
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 """A web GUI for GEMSEO study."""
+
 from __future__ import annotations
