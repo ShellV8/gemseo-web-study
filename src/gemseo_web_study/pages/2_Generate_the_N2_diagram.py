@@ -25,23 +25,47 @@ from os.path import join
 import streamlit as st
 import streamlit.components.v1 as components
 from gemseo import generate_n2_plot
+from gemseo import MDODiscipline
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
     st.session_state[k] = v
 
-disc_ready = "disciplines" in st.session_state
-if disc_ready:
-    disciplines = st.session_state["disciplines"]
 
-    if st.button("Generate N2", type="primary"):
-        tmpdir = tempfile.mkdtemp()
-        tmp_file = join(tmpdir, "n2.png")
-        tmp_html = join(tmpdir, "n2.html")
+@st.cache_data
+def generate_html(_disciplines: list[MDODiscipline], disc_desc: list) -> str:
+    """Generates the HTML file.
 
-        generate_n2_plot(disciplines, file_path=tmp_file)
-        with open(tmp_html, encoding="utf-8") as HtmlFile:  #
-            source_code = HtmlFile.read()
+    Args:
+        _disciplines: The disciplines instances.
+        disc_desc: The disciplines descriptions.
+    """
+    tmpdir = tempfile.mkdtemp()
+    tmp_file = join(tmpdir, "n2.png")
+    tmp_html = join(tmpdir, "n2.html")
+
+    generate_n2_plot(_disciplines, file_path=tmp_file)
+    with open(tmp_html, encoding="utf-8") as html_file:  #
+        source_code = html_file.read()
+    return source_code
+
+
+def handle_n2_genration() -> None:
+    """Handles the generation of the N2.
+
+    From the disciplines tab, creates an N2 diagram in the page if the inputs are ready.
+    """
+    disc_ready = "disciplines" in st.session_state
+    if disc_ready:
+        disciplines = st.session_state["disciplines"]
+
+        if st.button("Generate N2", type="primary"):
+            disc_desc = st.session_state["disc_desc"]
+            source_code = generate_html(disciplines, disc_desc)
             components.html(source_code, width=800, height=800)
-else:
-    st.error("Disciplines are not ready, please check the Disciplines tab.")
+    else:
+        st.error("Disciplines are not ready, please check the Disciplines tab.")
+
+
+# Main display sequence
+handle_n2_genration()

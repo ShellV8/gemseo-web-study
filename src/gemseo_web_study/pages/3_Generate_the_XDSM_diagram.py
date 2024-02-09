@@ -27,6 +27,8 @@ import streamlit.components.v1 as components
 from gemseo import create_design_space
 from gemseo import create_scenario
 from gemseo import get_available_formulations
+from gemseo import MDODiscipline
+from gemseo.core.mdo_scenario import MDOScenario
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
@@ -34,13 +36,16 @@ for k, v in st.session_state.items():
 st.title("XDSM Generation")
 CTYPES = ["inequality", "equality"]
 
-if "disciplines" in st.session_state:
+
+def handle_disc_summary() -> None:
+    """Handles the disciplines summary."""
     st.write("Disciplines summary")
     st.dataframe(st.session_state["disciplines_dataframe"], hide_index=True)
     st.divider()
 
-    disciplines = st.session_state["disciplines"]
-    all_outputs = st.session_state["all_outputs"]
+
+def handle_design_variables() -> None:
+    """Handles the design variables."""
     all_inputs = st.session_state["all_inputs"]
     key = "Design variables"
     design_variables = st.multiselect(
@@ -48,6 +53,9 @@ if "disciplines" in st.session_state:
     )
     st.session_state[key] = design_variables
 
+
+def handle_formulation() -> None:
+    """Handles the MDO formulation."""
     formulations_key = "formulations_list"
     if formulations_key in st.session_state:
         formulations = st.session_state[formulations_key]
@@ -61,14 +69,13 @@ if "disciplines" in st.session_state:
         "MDO Formulation", formulations, index=index, key="MDO formulation"
     )
     st.session_state[key] = formulations.index(formulation)
+    st.session_state["mdo formulation"] = formulation
 
-    key = "maximize_objective"
-    maximize_objective = st.checkbox(
-        "maximize_objective", value=st.session_state.get(key, False)
-    )
-    st.session_state[key] = maximize_objective
 
+def handle_objective() -> None:
+    """Handles the objective function and its maximization."""
     key = "objective_index"
+    all_outputs = st.session_state["all_outputs"]
     objective = st.selectbox(
         "Objective function name",
         all_outputs,
@@ -76,7 +83,15 @@ if "disciplines" in st.session_state:
         key="objective",
     )
     st.session_state[key] = all_outputs.index(objective)
+    key = "maximize_objective"
+    maximize_objective = st.checkbox(
+        "maximize_objective", value=st.session_state.get(key, False)
+    )
+    st.session_state[key] = maximize_objective
 
+
+def handle_constraints() -> None:
+    """Handles the constraints definition."""
     key = "Number of constraints"
     nb_cstr = st.slider(
         "Number of constraints",
@@ -87,6 +102,7 @@ if "disciplines" in st.session_state:
     st.session_state[key] = nb_cstr
 
     constraints = {}
+    all_outputs = st.session_state["all_outputs"]
     for i in range(nb_cstr):
         st.divider()
         key = f"Constraint {i + 1}"
@@ -108,9 +124,20 @@ if "disciplines" in st.session_state:
 
         if constr:
             constraints[constr] = c_type
+    st.session_state["constraints"] = constraints
 
+
+def handle_scenario() -> MDOScenario | None:
+    """Handles the MDO scenario."""
+    design_variables = st.session_state["Design variables"]
+    obj_index = st.session_state["objective_index"]
+    objective = st.session_state["all_outputs"][obj_index]
     if not (objective and design_variables):
         st.error("Please select an objective and design variables")
+    disciplines = st.session_state["disciplines"]
+    scenario = None
+    if not disciplines:
+        st.error("Please select the disciplines.")
     elif st.button("Generate XDSM", type="primary"):
         design_space = create_design_space()
         for name in design_variables:
@@ -119,22 +146,40 @@ if "disciplines" in st.session_state:
             scenario = create_scenario(
                 design_space=design_space,
                 objective_name=objective,
-                maximize_objective=maximize_objective,
+                maximize_objective=st.session_state["maximize_objective"],
                 disciplines=disciplines,
-                formulation=formulation,
+                formulation=st.session_state["mdo formulation"],
+                grammar_type=MDODiscipline.GrammarType.SIMPLE,
             )
             cmap = {"inequality": "ineq", "equality": "eq"}
+            constraints = st.session_state["constraints"]
             for constr, ctype in constraints.items():
                 scenario.add_constraint(constr, constraint_type=cmap[ctype])
-            tmpdir = tempfile.mkdtemp()
-
-            scenario.xdsmize(directory_path=tmpdir)
-            tmp_html = join(tmpdir, "xdsm.html")
-            with open(tmp_html, encoding="utf-8") as HtmlFile:
-                source_code = HtmlFile.read()
-                components.html(source_code, width=1280, height=1024)
         except Exception as err:
             st.error(str(err))  # noqa: G200
+            return None
+    return scenario
 
+
+def generate_xdsm(scenario: MDOScenario) -> None:
+    """Generates the XDSM diagram."""
+    tmpdir = tempfile.mkdtemp()
+    scenario.xdsmize(directory_path=tmpdir)
+    tmp_html = join(tmpdir, "xdsm.html")
+    with open(tmp_html, encoding="utf-8") as html_file:
+        source_code = html_file.read()
+        components.html(source_code, width=1280, height=1024)
+
+
+# Main display sequence
+if "disciplines" in st.session_state:
+    handle_disc_summary()
+    handle_design_variables()
+    handle_formulation()
+    handle_objective()
+    handle_constraints()
+    scenario = handle_scenario()
+    if scenario is not None:
+        generate_xdsm(scenario)
 else:
     st.error("Disciplines are not ready, please check the Disciplines tab")

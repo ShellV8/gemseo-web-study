@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import pandas as pd
 import streamlit as st
+from gemseo import MDODiscipline
 from gemseo.problems.scalable.linear.disciplines_generator import (
     create_disciplines_from_desc,
 )
@@ -78,6 +79,14 @@ def handle_disciplines_description(nb_disc: int, disc_desc: list) -> None:
         disc_desc.append((name, inputs, outputs))
 
 
+@st.cache_data
+def create_mdo_disciplines(disc_desc: list) -> list[MDODiscipline]:
+    """Creates the disciplines instances."""
+    return create_disciplines_from_desc(
+        disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
+    )
+
+
 def handle_disciplines_summary(disc_desc: list) -> None:
     """Generates a summary of the disciplines Uses a Dataframe view widget.
 
@@ -102,8 +111,9 @@ def handle_disciplines_summary(disc_desc: list) -> None:
             st.dataframe(df, hide_index=True)
             st.session_state["disciplines_dataframe"] = df
             st.divider()
-            disciplines = create_disciplines_from_desc(disc_desc)
+            disciplines = create_mdo_disciplines(disc_desc)
             st.session_state["disciplines"] = disciplines
+            st.session_state["disc_desc"] = disc_desc
             all_outputs = set()
             all_inputs = set()
             for disc in disciplines:
