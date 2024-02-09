@@ -62,7 +62,11 @@ def handle_n2_genration() -> None:
         if st.button("Generate N2", type="primary"):
             disc_desc = st.session_state["disc_desc"]
             source_code = generate_html(disciplines, disc_desc)
+            st.download_button(
+                "Download N2 standalone HTML file", source_code, file_name="N2.html"
+            )
             components.html(source_code, width=800, height=800)
+
     else:
         st.error("Disciplines are not ready, please check the Disciplines tab.")
 

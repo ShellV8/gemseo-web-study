@@ -168,6 +168,9 @@ def generate_xdsm(scenario: MDOScenario) -> None:
     tmp_html = join(tmpdir, "xdsm.html")
     with open(tmp_html, encoding="utf-8") as html_file:
         source_code = html_file.read()
+        st.download_button(
+            "Download XDSM standalone HTML file", source_code, file_name="xdsm.html"
+        )
         components.html(source_code, width=1280, height=1024)
 
 
