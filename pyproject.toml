@@ -13,12 +13,12 @@ classifiers = [
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
 dynamic = ["version"]
-requires-python = ">=3.8, <3.11"
+requires-python = ">=3.9, <3.12"
 dependencies = [
     "gemseo >=5",
     "streamlit >= 1.27",
@@ -28,7 +28,7 @@ dependencies = [
 [project.optional-dependencies]
 test = [
     "covdefaults",
-    "pytest",
+    "pytest <8",
     "pytest-cov",
     "pytest-xdist",
 ]
@@ -59,6 +59,3 @@ license-files = [
     "LICENSE.txt",
     "CREDITS.md",
 ]
-
-[tool.black]
-target-version = ['py38']
