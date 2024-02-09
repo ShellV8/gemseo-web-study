@@ -27,6 +27,10 @@ from gemseo.problems.scalable.linear.disciplines_generator import (
 )
 from streamlit_tags import st_tags
 
+# this is to keep the widget values between pages
+for k, v in st.session_state.items():
+    st.session_state[k] = v
+
 
 def handle_disciplines_number() -> int:
     """Handle the widget that defines the number of disciplines.
@@ -34,13 +38,15 @@ def handle_disciplines_number() -> int:
     Stores the
     """
     key = "Number of disciplines"
-    value = st.session_state.get(key, 2)
-    return st.slider(
+    key_val = key + "_val"
+    value = st.session_state.get(key_val, 2)
+    value = st.slider(
         "Number of disciplines", min_value=1, max_value=20, value=value, key=key
     )
+    st.session_state[key_val] = value
 
 
-def handle_disciplines_description(nb_disc: int, disc_desc: list) -> None:
+def handle_disciplines_description(disc_desc: list) -> None:
     """Handles the disciplines description.
 
     For each discipline, of number nb_disc,
@@ -51,6 +57,7 @@ def handle_disciplines_description(nb_disc: int, disc_desc: list) -> None:
         nb_disc: The number of disciplines
         disc_desc: The disciplines description.
     """
+    nb_disc = st.session_state["Number of disciplines_val"]
     for i in range(nb_disc):
         st.divider()
         key = f"Disc_{i}_name"
@@ -127,7 +134,7 @@ def handle_disciplines_summary(disc_desc: list) -> None:
 
 
 # Main display sequence
-nb_disc = handle_disciplines_number()
+handle_disciplines_number()
 disc_desc = []
-handle_disciplines_description(nb_disc, disc_desc)
+handle_disciplines_description(disc_desc)
 handle_disciplines_summary(disc_desc)

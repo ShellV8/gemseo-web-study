@@ -101,6 +101,7 @@ def handle_constraints() -> None:
         min_value=0,
         max_value=20,
         value=st.session_state.get(key, 0),
+        key="Constraints slider",
     )
     st.session_state[key] = nb_cstr
 
