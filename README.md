@@ -8,30 +8,41 @@ Commons, PO Box 1866, Mountain View, CA 94042, USA.
 -->
 
 A web interface for GEMSEO to prototype MDO studies
+=======
+# gemseo-web-study
 
-# Documentation
+[![PyPI - License](https://img.shields.io/pypi/l/gemseo)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gemseo-web-study)](https://pypi.org/project/gemseo-web-study/)
+[![PyPI](https://img.shields.io/pypi/v/gemseo-web-study)](https://pypi.org/project/gemseo-web-study/)
+[![Codecov branch](https://img.shields.io/codecov/c/gitlab/gemseo:dev/gemseo-web-study/develop)](https://app.codecov.io/gl/gemseo:dev/gemseo-web-study)
 
 To launch the website:
 streamlit run .\src\gemseo_web_study\Welcome_to_GEMSEO_study.py
+=======
+## Overview
 
-# Bugs/Questions
+A web interface for GEMSEO to prototype MDO studues
 
-Please use the gitlab issue tracker at
-<https://gitlab.com/gemseo/dev/gemseo-web-study/-/issues>
-to submit bugs or questions.
+## Installation
 
-# License
+Install the latest stable version with `pip install gemseo-web-study`.
 
-The **gemseo-web-study** source code is distributed under the GNU LGPL v3.0 license.
-A copy of it can be found in the LICENSE.txt file.
-The GNU LGPL v3.0 license is an exception to the GNU GPL v3.0 license.
-A copy of the GNU GPL v3.0 license can be found in the LICENSES folder.
+Install the development version with
+`pip install gemseo-web-study@git+https://gitlab.com/gemseo/dev/gemseo-web-study.git@develop`.
 
 The **gemseo-web-study** documentation is distributed under the CC BY-SA 4.0 license.
+=======
+See [pip](https://pip.pypa.io/en/stable/getting-started/) for more information.
 
-The **gemseo-web-study** product depends on other software which have various licenses.
-The list of dependencies with their licenses is given in the CREDITS.md file.
+## Bugs and questions
 
-# Contributors
+Please use the [gitlab issue tracker](https://gitlab.com/gemseo/dev/gemseo-web-study/-/issues)
+to submit bugs or questions.
+
+## Contributing
+
+See the [contributing section of GEMSEO](https://gemseo.readthedocs.io/en/stable/software/developing.html#dev).
+
+## Contributors
 
 - Francois Gallard
