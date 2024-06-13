@@ -41,8 +41,7 @@ def handle_disciplines_number() -> int:
     key_val = key + "_val"
     value = st.session_state.get(key_val, 2)
     value = st.slider(
-        "Number of disciplines", min_value=1, max_value=20, value=value, key=key
-    )
+        "The number of disciplines", min_value=1, max_value=20, value=value)#, key=key)
     st.session_state[key_val] = value
 
 
