@@ -26,13 +26,15 @@ import streamlit as st
 import streamlit.components.v1 as components
 from gemseo import MDODiscipline
 from gemseo import generate_n2_plot
+from gemseo.core.coupling_structure import MDOCouplingStructure
 from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
     st.session_state[k] = v
 
-
+# pyplot display warning
+st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
 @st.cache_data
@@ -80,14 +82,24 @@ def handle_n2_genration() -> None:
     """
     if "disciplines" in st.session_state:
         disciplines = st.session_state["disciplines"]
+        format=st.selectbox(
+            "N2 diagram format", ["HTML","basic"], index=1, key="N2 diagram format"
+        )
 
-        if st.button("Generate N2", type="primary"):
+        if format=="HTML" and st.button("Generate N2", type="primary"):
             disc_desc = st.session_state["#disc_desc"]
             source_code = generate_html(disciplines, disc_desc)
             st.download_button(
                 "Download N2 standalone HTML file", source_code, file_name="N2.html"
             )
             components.html(source_code, width=800, height=800)
+        else:
+            coupl= MDOCouplingStructure(disciplines)
+            coupl._MDOCouplingStructure__draw_n2_chart(
+                    file_path="",show_data_names=True, save=False,show=False,
+            fig_size=(8,8))
+
+            st.pyplot()
 
     else:
         st.error("Disciplines are not ready, please check the Disciplines tab.")
