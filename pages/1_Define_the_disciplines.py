@@ -47,17 +47,15 @@ def handle_disciplines_number() -> int:
     st.session_state[key_val] = value
 
 
-def handle_disciplines_description(disc_desc: list) -> None:
+def handle_disciplines_description() -> None:
     """Handles the disciplines description.
 
     For each discipline, of number nb_disc,
     creates the widgets that allow the user to fill the inputs, outputs,
     and discipline name.
 
-    Args:
-        nb_disc: The number of disciplines
-        disc_desc: The disciplines description.
     """
+    disc_desc=[]
     nb_disc = st.session_state["#Number of disciplines_val"]
     for i in range(nb_disc):
         st.divider()
@@ -84,17 +82,38 @@ def handle_disciplines_description(disc_desc: list) -> None:
             key=key,
         )
         disc_desc.append((name, inputs, outputs))
+    st.session_state["#disc_desc"]=disc_desc
 
 
 @st.cache_data
-def create_mdo_disciplines(disc_desc: list) -> list[MDODiscipline]:
+def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
     """Creates the disciplines instances."""
-    return create_disciplines_from_desc(
+    disciplines= create_disciplines_from_desc(
         disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
     )
+    st.session_state["disciplines"] = disciplines
+    return disciplines
 
+def create_disciplines( ) -> None:
+    disc_desc = st.session_state.get("#disc_desc")
+    try:
+        if disc_desc is not None:
+            disciplines = create_mdo_disciplines(disc_desc)
+            st.session_state["disciplines"] = disciplines
 
-def handle_disciplines_summary(disc_desc: list) -> None:
+            all_outputs = set()
+            all_inputs = set()
+            for disc in disciplines:
+                all_outputs.update(disc.get_output_data_names())
+                all_inputs.update(disc.get_input_data_names())
+            st.session_state["#all_outputs"] = sorted(all_outputs)
+            st.session_state["#all_inputs"] = sorted(all_inputs)
+
+    except (ValueError, TypeError):
+        if "disciplines" in st.session_state:
+            del st.session_state["disciplines"]
+
+def handle_disciplines_summary() -> None:
     """Generates a summary of the disciplines Uses a Dataframe view widget.
 
     Args:
@@ -102,6 +121,7 @@ def handle_disciplines_summary(disc_desc: list) -> None:
     """
     st.divider()
     st.write("Disciplines summary")
+    disc_desc= st.session_state.get("#disc_desc")
     try:
         if disc_desc is not None:
             df = pd.DataFrame.from_records(
@@ -118,16 +138,7 @@ def handle_disciplines_summary(disc_desc: list) -> None:
             st.dataframe(df, hide_index=True)
             st.session_state["disciplines_dataframe"] = df
             st.divider()
-            disciplines = create_mdo_disciplines(disc_desc)
-            st.session_state["disciplines"] = disciplines
-            st.session_state["#disc_desc"] = disc_desc
-            all_outputs = set()
-            all_inputs = set()
-            for disc in disciplines:
-                all_outputs.update(disc.get_output_data_names())
-                all_inputs.update(disc.get_input_data_names())
-            st.session_state["#all_outputs"] = sorted(all_outputs)
-            st.session_state["#all_inputs"] = sorted(all_inputs)
+
 
     except (ValueError, TypeError):
         if "disciplines" in st.session_state:
@@ -136,7 +147,7 @@ def handle_disciplines_summary(disc_desc: list) -> None:
 
 # Main display sequence
 handle_disciplines_number()
-disc_desc = []
-handle_disciplines_description(disc_desc)
-handle_disciplines_summary(disc_desc)
+handle_disciplines_description()
+create_disciplines()
+handle_disciplines_summary()
 

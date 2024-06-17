@@ -29,6 +29,7 @@ from gemseo import MDODiscipline
 from gemseo import create_design_space
 from gemseo import create_scenario
 from gemseo import get_available_formulations
+from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
 
 if TYPE_CHECKING:
     from gemseo.core.mdo_scenario import MDOScenario
@@ -38,13 +39,6 @@ for k, v in st.session_state.items():
     st.session_state[k] = v
 st.title("XDSM Generation")
 CTYPES = ["inequality", "equality"]
-
-
-def handle_disc_summary() -> None:
-    """Handles the disciplines summary."""
-    st.write("Disciplines summary")
-    st.dataframe(st.session_state["disciplines_dataframe"], hide_index=True)
-    st.divider()
 
 
 def handle_design_variables() -> None:
@@ -178,6 +172,30 @@ def generate_xdsm(scenario: MDOScenario) -> None:
         components.html(source_code, width=1280, height=1024)
 
 
+@st.cache_data
+def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
+    """Creates the disciplines instances."""
+    disciplines= create_disciplines_from_desc(
+        disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
+    )
+    st.session_state["disciplines"] = disciplines
+    return disciplines
+
+def create_disciplines( ) -> None:
+    disc_desc = st.session_state.get("#disc_desc")
+    try:
+        if disc_desc is not None:
+            disciplines = create_mdo_disciplines(disc_desc)
+            st.session_state["disciplines"] = disciplines
+
+    except (ValueError, TypeError):
+        if "disciplines" in st.session_state:
+            del st.session_state["disciplines"]
+
+
+if "disciplines" not in st.session_state and "#disc_desc" in st.session_state:
+    create_disciplines( )
+
 # Main display sequence
 if "disciplines" in st.session_state:
     st.markdown(
@@ -187,7 +205,6 @@ if "disciplines" in st.session_state:
     """.format("https://gemseo.readthedocs.io/en/stable/mdo/mdo_formulations.html")
     )
 
-    handle_disc_summary()
     handle_design_variables()
     handle_formulation()
     handle_objective()

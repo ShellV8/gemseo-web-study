@@ -26,11 +26,35 @@ import streamlit as st
 import streamlit.components.v1 as components
 from gemseo import MDODiscipline
 from gemseo import generate_n2_plot
+from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
     st.session_state[k] = v
 
+
+
+
+@st.cache_data
+def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
+    """Creates the disciplines instances."""
+
+    disciplines= create_disciplines_from_desc(
+        disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
+    )
+    st.session_state["disciplines"] = disciplines
+    return disciplines
+
+def create_disciplines( ) -> None:
+    disc_desc = st.session_state.get("#disc_desc")
+    try:
+        if disc_desc is not None:
+            disciplines = create_mdo_disciplines(disc_desc)
+            st.session_state["disciplines"] = disciplines
+
+    except (ValueError, TypeError):
+        if "disciplines" in st.session_state:
+            del st.session_state["disciplines"]
 
 @st.cache_data
 def generate_html(_disciplines: list[MDODiscipline], disc_desc: list) -> str:
@@ -54,8 +78,7 @@ def handle_n2_genration() -> None:
 
     From the disciplines tab, creates an N2 diagram in the page if the inputs are ready.
     """
-    disc_ready = "disciplines" in st.session_state
-    if disc_ready:
+    if "disciplines" in st.session_state:
         disciplines = st.session_state["disciplines"]
 
         if st.button("Generate N2", type="primary"):
@@ -77,4 +100,6 @@ The N2 (pronounce "N square") diagram represents the coupling between the discip
 """.format("https://gemseo.readthedocs.io/en/stable/mdo/coupling.html")
 )
 
+if "disciplines" not in st.session_state and "#disc_desc" in st.session_state:
+    create_disciplines( )
 handle_n2_genration()
