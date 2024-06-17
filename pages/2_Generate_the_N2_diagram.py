@@ -33,7 +33,8 @@ from matplotlib.pyplot import gcf
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
-    st.session_state[k] = v
+    if k.startswith('#'):
+        st.session_state[k] = v
 
 
 @st.cache_data

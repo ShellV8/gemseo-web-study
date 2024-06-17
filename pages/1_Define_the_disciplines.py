@@ -30,7 +30,8 @@ import json
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
-    st.session_state[k] = v
+    if k.startswith('#'):
+        st.session_state[k] = v
 
 
 
@@ -61,7 +62,7 @@ def handle_disciplines_description() -> None:
         st.divider()
         key = f"#Disc_{i}_name"
         value = st.session_state.get(key, f"Discipline_{i}")
-        name = st.text_input("Discipline Name", value=value, key=f"Disc_{i}")
+        name = st.text_input("Discipline Name", value=value, key=f"Disc_{i}_name")
         st.session_state[key] = name
 
         key = f"#Disc_inputs_{i}"
