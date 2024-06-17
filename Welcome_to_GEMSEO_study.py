@@ -19,6 +19,7 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 from __future__ import annotations
 
+import json
 from os.path import dirname
 from os.path import join
 
@@ -62,24 +63,29 @@ In particular, it is a standard to represent the MDO formulations, see: [link]({
 st.divider()
 st.subheader("Saving and loading a study")
 st.markdown(
-"""
-You can download the study configuration as a JSON text file and load it in the future.
-"""
+    """
+    You can download the study configuration as a JSON text file and load it in the future.
+    """
 )
 # Handle data saving
-import json
+
+
 uploaded_file = st.file_uploader("Load existing study")
 if uploaded_file is not None:
-    state=json.loads(uploaded_file.read())
-    for k,v in state.items():
-        st.session_state[k]=v
+    state = json.loads(uploaded_file.read())
+    for k, v in state.items():
+        st.session_state[k] = v
 
-download_data={}
+download_data = {}
+
 
 def update_download_data():
     download_data.clear()
     for k, v in st.session_state.items():
         if k.startswith("#"):
             download_data[k] = v
+
+
 update_download_data()
-st.download_button(  "Save current study", json.dumps(download_data), file_name="gemseo_study.json", on_click=update_download_data   )
+st.download_button("Save current study", json.dumps(download_data), file_name="gemseo_study.json",
+                   on_click=update_download_data)

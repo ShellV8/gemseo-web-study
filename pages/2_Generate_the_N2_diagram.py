@@ -25,10 +25,8 @@ from os.path import join
 import streamlit as st
 import streamlit.components.v1 as components
 from gemseo import MDODiscipline
-from gemseo import generate_n2_plot
 from gemseo.core.coupling_structure import MDOCouplingStructure
 from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
-
 from matplotlib.pyplot import gcf
 
 # this is to keep the widget values between pages
@@ -41,13 +39,14 @@ for k, v in st.session_state.items():
 def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
     """Creates the disciplines instances."""
 
-    disciplines= create_disciplines_from_desc(
+    disciplines = create_disciplines_from_desc(
         disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
     )
     st.session_state["disciplines"] = disciplines
     return disciplines
 
-def create_disciplines( ) -> None:
+
+def create_disciplines() -> None:
     disc_desc = st.session_state.get("#disc_desc")
     try:
         if disc_desc is not None:
@@ -58,8 +57,8 @@ def create_disciplines( ) -> None:
         if "disciplines" in st.session_state:
             del st.session_state["disciplines"]
 
-@st.cache_data
-def generate_html(_disciplines: list[MDODiscipline], disc_desc: list) -> str:
+
+def generate_html(coupling_structure) -> str:
     """Generates the HTML file.
 
     Args:
@@ -70,9 +69,23 @@ def generate_html(_disciplines: list[MDODiscipline], disc_desc: list) -> str:
     tmp_file = join(tmpdir, "n2.png")
     tmp_html = join(tmpdir, "n2.html")
 
-    generate_n2_plot(_disciplines, file_path=tmp_file)
+    coupling_structure.plot_n2_chart(file_path=tmp_file, show_data_names=True,
+                                     save=True, show=False, show_html=False
+                                     )
     with open(tmp_html, encoding="utf-8") as html_file:  #
         return html_file.read()
+
+
+@st.cache_data
+def create_coupling_structure(disc_desc: list) -> MDOCouplingStructure:
+    """Generates the HTML file.
+
+    Args:
+        _disciplines: The disciplines instances.
+        disc_desc: The disciplines descriptions.
+    """
+    disciplines = st.session_state["disciplines"]
+    return MDOCouplingStructure(disciplines)
 
 
 def handle_n2_genration() -> None:
@@ -82,22 +95,22 @@ def handle_n2_genration() -> None:
     """
     if "disciplines" in st.session_state:
         disciplines = st.session_state["disciplines"]
-        format=st.selectbox(
-            "N2 diagram format", ["HTML","basic"], index=1, key="N2 diagram format"
+        format = st.selectbox(
+            "N2 diagram format", ["HTML", "basic"], index=1, key="N2 diagram format"
         )
+        disc_desc = st.session_state["#disc_desc"]
+        coupling_structure = create_coupling_structure(disc_desc)
+        if format == "HTML" and st.button("Generate N2", type="primary"):
 
-        if format=="HTML" and st.button("Generate N2", type="primary"):
-            disc_desc = st.session_state["#disc_desc"]
-            source_code = generate_html(disciplines, disc_desc)
+            source_code = generate_html(coupling_structure)
             st.download_button(
                 "Download N2 standalone HTML file", source_code, file_name="N2.html"
             )
             components.html(source_code, width=800, height=800)
         else:
-            coupl= MDOCouplingStructure(disciplines)
-            coupl._MDOCouplingStructure__draw_n2_chart(
-                    file_path="",show_data_names=True, save=False,show=False,
-            fig_size=(8,8))
+            coupling_structure._MDOCouplingStructure__draw_n2_chart(
+                file_path="", show_data_names=True, save=False, show=False,
+                fig_size=(8, 8))
 
             st.pyplot(gcf())
 
@@ -113,5 +126,5 @@ The N2 (pronounce "N square") diagram represents the coupling between the discip
 )
 
 if "disciplines" not in st.session_state and "#disc_desc" in st.session_state:
-    create_disciplines( )
+    create_disciplines()
 handle_n2_genration()

@@ -26,13 +26,11 @@ from gemseo.problems.scalable.linear.disciplines_generator import (
     create_disciplines_from_desc,
 )
 from streamlit_tags import st_tags
-import json
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
     if k.startswith('#'):
         st.session_state[k] = v
-
 
 
 def handle_disciplines_number() -> int:
@@ -44,7 +42,7 @@ def handle_disciplines_number() -> int:
     key_val = key + "_val"
     value = st.session_state.get(key_val, 2)
     value = st.slider(
-        "The number of disciplines", min_value=1, max_value=20, value=value)#, key=key)
+        "The number of disciplines", min_value=1, max_value=20, value=value)
     st.session_state[key_val] = value
 
 
@@ -56,7 +54,7 @@ def handle_disciplines_description() -> None:
     and discipline name.
 
     """
-    disc_desc=[]
+    disc_desc = []
     nb_disc = st.session_state["#Number of disciplines_val"]
     for i in range(nb_disc):
         st.divider()
@@ -82,20 +80,22 @@ def handle_disciplines_description() -> None:
             value=value,
             key=key,
         )
-        disc_desc.append((name, inputs, outputs))
-    st.session_state["#disc_desc"]=disc_desc
+        if inputs and outputs:
+            disc_desc.append((name, tuple(inputs), tuple(outputs)))
+    st.session_state["#disc_desc"] = tuple(disc_desc)
 
 
 @st.cache_data
 def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
     """Creates the disciplines instances."""
-    disciplines= create_disciplines_from_desc(
+    disciplines = create_disciplines_from_desc(
         disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
     )
     st.session_state["disciplines"] = disciplines
     return disciplines
 
-def create_disciplines( ) -> None:
+
+def create_disciplines() -> None:
     disc_desc = st.session_state.get("#disc_desc")
     try:
         if disc_desc is not None:
@@ -114,6 +114,7 @@ def create_disciplines( ) -> None:
         if "disciplines" in st.session_state:
             del st.session_state["disciplines"]
 
+
 def handle_disciplines_summary() -> None:
     """Generates a summary of the disciplines Uses a Dataframe view widget.
 
@@ -121,8 +122,8 @@ def handle_disciplines_summary() -> None:
         disc_desc: The disciplines description.
     """
     st.divider()
-    st.write("Disciplines summary")
-    disc_desc= st.session_state.get("#disc_desc")
+    st.subheader("Disciplines summary")
+    disc_desc = st.session_state.get("#disc_desc")
     try:
         if disc_desc is not None:
             df = pd.DataFrame.from_records(
@@ -151,4 +152,3 @@ handle_disciplines_number()
 handle_disciplines_description()
 create_disciplines()
 handle_disciplines_summary()
-

@@ -106,7 +106,8 @@ def handle_constraints() -> None:
         st.divider()
         key = f"#Constraint {i + 1}"
         c_index = st.session_state.get(key)
-        constr = st.selectbox(key, all_outputs, index=c_index, key="c_" + key)
+        constr = st.selectbox(f"Constraint {i + 1}", all_outputs,
+                              index=c_index, key="c_" + key)
         if constr is not None:
             st.session_state[key] = all_outputs.index(constr)
 
@@ -176,13 +177,14 @@ def generate_xdsm(scenario: MDOScenario) -> None:
 @st.cache_data
 def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
     """Creates the disciplines instances."""
-    disciplines= create_disciplines_from_desc(
+    disciplines = create_disciplines_from_desc(
         disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
     )
     st.session_state["disciplines"] = disciplines
     return disciplines
 
-def create_disciplines( ) -> None:
+
+def create_disciplines() -> None:
     disc_desc = st.session_state.get("#disc_desc")
     try:
         if disc_desc is not None:
@@ -195,7 +197,7 @@ def create_disciplines( ) -> None:
 
 
 if "disciplines" not in st.session_state and "#disc_desc" in st.session_state:
-    create_disciplines( )
+    create_disciplines()
 
 # Main display sequence
 if "disciplines" in st.session_state:
