@@ -58,3 +58,21 @@ In particular, it is a standard to represent the MDO formulations, see: [link]({
         "https://gemseo.readthedocs.io/en/stable/mdo/mdo_formulations.html",
     )
 )
+
+# Handle data saving
+import json
+uploaded_file = st.file_uploader("Load existing study")
+if uploaded_file is not None:
+    state=json.loads(uploaded_file.read())
+    for k,v in state.items():
+        st.session_state[k]=v
+
+download_data={}
+
+def update_download_data():
+    download_data.clear()
+    for k, v in st.session_state.items():
+        if k.startswith("#"):
+            download_data[k] = v
+update_download_data()
+st.download_button(  "Download scession state", json.dumps(download_data), file_name="gemseo_study.json", on_click=update_download_data   )

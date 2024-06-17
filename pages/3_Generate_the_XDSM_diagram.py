@@ -49,8 +49,8 @@ def handle_disc_summary() -> None:
 
 def handle_design_variables() -> None:
     """Handles the design variables."""
-    all_inputs = st.session_state["all_inputs"]
-    key = "Design variables"
+    all_inputs = st.session_state["#all_inputs"]
+    key = "#Design variables"
     design_variables = st.multiselect(
         "Design variables", options=all_inputs, default=st.session_state.get(key, [])
     )
@@ -66,19 +66,19 @@ def handle_formulation() -> None:
         formulations = get_available_formulations()
         st.session_state[formulations_key] = formulations
 
-    key = "MDO formulation index"
+    key = "#MDO formulation index"
     index = st.session_state.get(key, formulations.index("MDF"))
     formulation = st.selectbox(
         "MDO Formulation", formulations, index=index, key="MDO formulation"
     )
     st.session_state[key] = formulations.index(formulation)
-    st.session_state["mdo formulation"] = formulation
+    st.session_state["#mdo formulation"] = formulation
 
 
 def handle_objective() -> None:
     """Handles the objective function and its maximization."""
-    key = "objective_index"
-    all_outputs = st.session_state["all_outputs"]
+    key = "#objective_index"
+    all_outputs = st.session_state["#all_outputs"]
     objective = st.selectbox(
         "Objective function name",
         all_outputs,
@@ -86,7 +86,7 @@ def handle_objective() -> None:
         key="objective",
     )
     st.session_state[key] = all_outputs.index(objective)
-    key = "maximize_objective"
+    key = "#maximize_objective"
     maximize_objective = st.checkbox(
         "maximize_objective", value=st.session_state.get(key, False)
     )
@@ -95,7 +95,7 @@ def handle_objective() -> None:
 
 def handle_constraints() -> None:
     """Handles the constraints definition."""
-    key = "Number of constraints"
+    key = "#Number of constraints"
     nb_cstr = st.slider(
         "Number of constraints",
         min_value=0,
@@ -106,16 +106,16 @@ def handle_constraints() -> None:
     st.session_state[key] = nb_cstr
 
     constraints = {}
-    all_outputs = st.session_state["all_outputs"]
+    all_outputs = st.session_state["#all_outputs"]
     for i in range(nb_cstr):
         st.divider()
-        key = f"Constraint {i + 1}"
+        key = f"#Constraint {i + 1}"
         c_index = st.session_state.get(key)
         constr = st.selectbox(key, all_outputs, index=c_index, key="c_" + key)
         if constr is not None:
             st.session_state[key] = all_outputs.index(constr)
 
-        key = f"constr_type{i}"
+        key = f"#constr_type{i}"
         c_type_index = st.session_state.get(key, 0)
         c_type = st.selectbox(
             "Constraint type",
@@ -128,14 +128,14 @@ def handle_constraints() -> None:
 
         if constr:
             constraints[constr] = c_type
-    st.session_state["constraints"] = constraints
+    st.session_state["#constraints"] = constraints
 
 
 def handle_scenario() -> MDOScenario | None:
     """Handles the MDO scenario."""
-    design_variables = st.session_state["Design variables"]
-    obj_index = st.session_state["objective_index"]
-    objective = st.session_state["all_outputs"][obj_index]
+    design_variables = st.session_state["#Design variables"]
+    obj_index = st.session_state["#objective_index"]
+    objective = st.session_state["#all_outputs"][obj_index]
     if not (objective and design_variables):
         st.error("Please select an objective and design variables")
     disciplines = st.session_state["disciplines"]
@@ -150,13 +150,13 @@ def handle_scenario() -> MDOScenario | None:
             scenario = create_scenario(
                 design_space=design_space,
                 objective_name=objective,
-                maximize_objective=st.session_state["maximize_objective"],
+                maximize_objective=st.session_state["#maximize_objective"],
                 disciplines=disciplines,
-                formulation=st.session_state["mdo formulation"],
+                formulation=st.session_state["#mdo formulation"],
                 grammar_type=MDODiscipline.GrammarType.SIMPLE,
             )
             cmap = {"inequality": "ineq", "equality": "eq"}
-            constraints = st.session_state["constraints"]
+            constraints = st.session_state["#constraints"]
             for constr, ctype in constraints.items():
                 scenario.add_constraint(constr, constraint_type=cmap[ctype])
         except Exception as err:

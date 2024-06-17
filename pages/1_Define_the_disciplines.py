@@ -26,10 +26,12 @@ from gemseo.problems.scalable.linear.disciplines_generator import (
     create_disciplines_from_desc,
 )
 from streamlit_tags import st_tags
+import json
 
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
     st.session_state[k] = v
+
 
 
 def handle_disciplines_number() -> int:
@@ -37,7 +39,7 @@ def handle_disciplines_number() -> int:
 
     Stores the
     """
-    key = "Number of disciplines"
+    key = "#Number of disciplines"
     key_val = key + "_val"
     value = st.session_state.get(key_val, 2)
     value = st.slider(
@@ -56,15 +58,15 @@ def handle_disciplines_description(disc_desc: list) -> None:
         nb_disc: The number of disciplines
         disc_desc: The disciplines description.
     """
-    nb_disc = st.session_state["Number of disciplines_val"]
+    nb_disc = st.session_state["#Number of disciplines_val"]
     for i in range(nb_disc):
         st.divider()
-        key = f"Disc_{i}_name"
+        key = f"#Disc_{i}_name"
         value = st.session_state.get(key, f"Discipline_{i}")
         name = st.text_input("Discipline Name", value=value, key=f"Disc_{i}")
         st.session_state[key] = name
 
-        key = f"Disc_inputs_{i}"
+        key = f"#Disc_inputs_{i}"
         value = st.session_state.get(key, [])
         inputs = st_tags(
             label=f"Discipline {i} Inputs:",
@@ -73,7 +75,7 @@ def handle_disciplines_description(disc_desc: list) -> None:
             key=key,
         )
 
-        key = f"Disc_outputs_{i}"
+        key = f"#Disc_outputs_{i}"
         value = st.session_state.get(key, [])
         outputs = st_tags(
             label=f"Discipline {i} Outputs:",
@@ -118,14 +120,14 @@ def handle_disciplines_summary(disc_desc: list) -> None:
             st.divider()
             disciplines = create_mdo_disciplines(disc_desc)
             st.session_state["disciplines"] = disciplines
-            st.session_state["disc_desc"] = disc_desc
+            st.session_state["#disc_desc"] = disc_desc
             all_outputs = set()
             all_inputs = set()
             for disc in disciplines:
                 all_outputs.update(disc.get_output_data_names())
                 all_inputs.update(disc.get_input_data_names())
-            st.session_state["all_outputs"] = sorted(all_outputs)
-            st.session_state["all_inputs"] = sorted(all_inputs)
+            st.session_state["#all_outputs"] = sorted(all_outputs)
+            st.session_state["#all_inputs"] = sorted(all_inputs)
 
     except (ValueError, TypeError):
         if "disciplines" in st.session_state:
@@ -137,3 +139,4 @@ handle_disciplines_number()
 disc_desc = []
 handle_disciplines_description(disc_desc)
 handle_disciplines_summary(disc_desc)
+
