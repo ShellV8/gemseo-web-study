@@ -29,12 +29,11 @@ from gemseo import generate_n2_plot
 from gemseo.core.coupling_structure import MDOCouplingStructure
 from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
 
+from matplotlib.pyplot import gcf
+
 # this is to keep the widget values between pages
 for k, v in st.session_state.items():
     st.session_state[k] = v
-
-# pyplot display warning
-st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
 @st.cache_data
@@ -99,7 +98,7 @@ def handle_n2_genration() -> None:
                     file_path="",show_data_names=True, save=False,show=False,
             fig_size=(8,8))
 
-            st.pyplot()
+            st.pyplot(gcf())
 
     else:
         st.error("Disciplines are not ready, please check the Disciplines tab.")
