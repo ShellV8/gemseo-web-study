@@ -29,16 +29,12 @@ from gemseo import MDODiscipline
 from gemseo import create_design_space
 from gemseo import create_scenario
 from gemseo import get_available_formulations
-from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
+
+from pages import handle_session_state, create_disciplines, handle_disciplines_summary
 
 if TYPE_CHECKING:
     from gemseo.core.mdo_scenario import MDOScenario
 
-# this is to keep the widget values between pages
-for k, v in st.session_state.items():
-    if k.startswith('#'):
-        st.session_state[k] = v
-st.title("XDSM Generation")
 CTYPES = ["inequality", "equality"]
 
 
@@ -174,27 +170,8 @@ def generate_xdsm(scenario: MDOScenario) -> None:
         components.html(source_code, width=1280, height=1024)
 
 
-@st.cache_data
-def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
-    """Creates the disciplines instances."""
-    disciplines = create_disciplines_from_desc(
-        disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
-    )
-    st.session_state["disciplines"] = disciplines
-    return disciplines
-
-
-def create_disciplines() -> None:
-    disc_desc = st.session_state.get("#disc_desc")
-    try:
-        if disc_desc is not None:
-            disciplines = create_mdo_disciplines(disc_desc)
-            st.session_state["disciplines"] = disciplines
-
-    except (ValueError, TypeError):
-        if "disciplines" in st.session_state:
-            del st.session_state["disciplines"]
-
+st.title("XDSM Generation")
+handle_session_state()
 
 if "disciplines" not in st.session_state and "#disc_desc" in st.session_state:
     create_disciplines()
@@ -207,7 +184,8 @@ if "disciplines" in st.session_state:
     In particular, it is a standard to represent the MDO formulations, see: [link]({}).
     """.format("https://gemseo.readthedocs.io/en/stable/mdo/mdo_formulations.html")
     )
-
+    handle_disciplines_summary()
+    st.subheader("Scenario definition")
     handle_design_variables()
     handle_formulation()
     handle_objective()

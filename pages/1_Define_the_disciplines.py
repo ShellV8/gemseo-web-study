@@ -19,18 +19,10 @@
 #    OTHER AUTHORS   - MACROSCOPIC CHANGES
 from __future__ import annotations
 
-import pandas as pd
 import streamlit as st
-from gemseo import MDODiscipline
-from gemseo.problems.scalable.linear.disciplines_generator import (
-    create_disciplines_from_desc,
-)
 from streamlit_tags import st_tags
 
-# this is to keep the widget values between pages
-for k, v in st.session_state.items():
-    if k.startswith('#'):
-        st.session_state[k] = v
+from pages import handle_session_state, create_disciplines, handle_disciplines_summary
 
 
 def handle_disciplines_number() -> int:
@@ -86,69 +78,29 @@ def handle_disciplines_description() -> None:
 
 
 @st.cache_data
-def create_mdo_disciplines(disc_desc) -> list[MDODiscipline]:
-    """Creates the disciplines instances."""
-    disciplines = create_disciplines_from_desc(
-        disc_desc, grammar_type=MDODiscipline.GrammarType.SIMPLE
-    )
-    st.session_state["disciplines"] = disciplines
-    return disciplines
+def get_all_ios(disc_desc):
+    all_outputs = set()
+    all_inputs = set()
+    for _, input_names, output_names in disc_desc:
+        all_inputs.update(input_names)
+        all_outputs.update(output_names)
+
+    return sorted(all_inputs), sorted(all_outputs)
 
 
-def create_disciplines() -> None:
+def handle_all_ios():
     disc_desc = st.session_state.get("#disc_desc")
-    try:
-        if disc_desc is not None:
-            disciplines = create_mdo_disciplines(disc_desc)
-            st.session_state["disciplines"] = disciplines
-
-            all_outputs = set()
-            all_inputs = set()
-            for disc in disciplines:
-                all_outputs.update(disc.get_output_data_names())
-                all_inputs.update(disc.get_input_data_names())
-            st.session_state["#all_outputs"] = sorted(all_outputs)
-            st.session_state["#all_inputs"] = sorted(all_inputs)
-
-    except (ValueError, TypeError):
-        if "disciplines" in st.session_state:
-            del st.session_state["disciplines"]
-
-
-def handle_disciplines_summary() -> None:
-    """Generates a summary of the disciplines Uses a Dataframe view widget.
-
-    Args:
-        disc_desc: The disciplines description.
-    """
-    st.divider()
-    st.subheader("Disciplines summary")
-    disc_desc = st.session_state.get("#disc_desc")
-    try:
-        if disc_desc is not None:
-            df = pd.DataFrame.from_records(
-                [
-                    {
-                        "Name": i[0],
-                        "Inputs": str(sorted(i[1])),
-                        "Outputs": str(sorted(i[2])),
-                    }
-                    for i in disc_desc
-                ],
-                columns=["Name", "Inputs", "Outputs"],
-            )
-            st.dataframe(df, hide_index=True)
-            st.session_state["disciplines_dataframe"] = df
-            st.divider()
-
-
-    except (ValueError, TypeError):
-        if "disciplines" in st.session_state:
-            del st.session_state["disciplines"]
+    if disc_desc is not None:
+        all_inputs, all_outputs = get_all_ios(disc_desc)
+        st.session_state["#all_outputs"] = all_outputs
+        st.session_state["#all_inputs"] = all_inputs
 
 
 # Main display sequence
+handle_session_state()
+st.title("Disciplines defintion")
 handle_disciplines_number()
 handle_disciplines_description()
 create_disciplines()
+handle_all_ios()
 handle_disciplines_summary()

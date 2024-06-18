@@ -29,10 +29,7 @@ from gemseo.core.coupling_structure import MDOCouplingStructure
 from gemseo.problems.scalable.linear.disciplines_generator import create_disciplines_from_desc
 from matplotlib.pyplot import gcf
 
-# this is to keep the widget values between pages
-for k, v in st.session_state.items():
-    if k.startswith('#'):
-        st.session_state[k] = v
+from pages import handle_session_state
 
 
 @st.cache_data
@@ -118,6 +115,9 @@ def handle_n2_genration() -> None:
         st.error("Disciplines are not ready, please check the Disciplines tab.")
 
 
+# this is to keep the widget values between pages
+handle_session_state()
+st.title("N2 diagram generation")
 # Main display sequence
 st.markdown(
     """
